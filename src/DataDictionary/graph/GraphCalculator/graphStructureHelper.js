@@ -17,23 +17,73 @@
  * @param {Object[]} wholeGraphNodes - array of nodes in the origin whole graph
  * @returns {string[]} array of descendent node IDs
  */
+
 export const getAllChildrenNodeIDs = (startingNodeID, wholeGraphNodes) => {
   const relatedNodeIDs = [];
   const startingNode = wholeGraphNodes.find(n => n.id === startingNodeID);
   let currentLevelNodeIDs = startingNode.outLinks;
-  while (currentLevelNodeIDs && currentLevelNodeIDs.length > 0) {
-    const nextLevelNodeIDs = [];
-    currentLevelNodeIDs.forEach((nodeId) => {
-      if (relatedNodeIDs.includes(nodeId) || nextLevelNodeIDs.includes(nodeId)) return;
-      relatedNodeIDs.push(nodeId);
-      const originNode = wholeGraphNodes.find(n => (n.id === nodeId));
-      const nextLevel = originNode.outLinks;
-      nextLevel.forEach((outNodeId) => {
-        nextLevelNodeIDs.push(outNodeId);
+  let currentLevelValidNodeIDs = [];
+  const relatedLinks = [];
+  currentLevelNodeIDs.forEach((outID) => {
+    const targetID = wholeGraphNodes.find((n) => n.id === outID);
+    const index = targetID.outLinks.findIndex((id) => id === startingNodeID);
+    if (index === -1) {
+      relatedLinks.push({
+        source: startingNode.id,
+        target: outID,
       });
-    });
-    currentLevelNodeIDs = nextLevelNodeIDs;
+      currentLevelValidNodeIDs.push(outID);
+    }
+  });
+
+  while (currentLevelValidNodeIDs.length > 0) {
+    const nextLevelNodeIDs = [];
+    for (let i = 0; i < currentLevelValidNodeIDs.length; i += 1) {
+      const nodeID = currentLevelValidNodeIDs[i];
+      relatedNodeIDs.push(nodeID);
+      const originNode = wholeGraphNodes.find((n) => (n.id === nodeID));
+      const nextLevelValidNodeIDs = [];
+      const nextLevel = originNode.outLinks;
+      nextLevel.forEach((outID) => {
+        const targetID = wholeGraphNodes.find((n) => n.id === outID);
+        const index = targetID.outLinks.findIndex((id) => id === nodeID);
+        if (index === -1) {
+          nextLevelValidNodeIDs.push(outID);
+        }
+      });
+      for (let j = 0; j < nextLevelValidNodeIDs.length; j += 1) {
+        const outNodeID = nextLevelValidNodeIDs[j];
+        relatedLinks.push({
+          source: nodeID,
+          target: outNodeID,
+        });
+        nextLevelNodeIDs.push(outNodeID);
+      }
+      currentLevelValidNodeIDs = nextLevelNodeIDs;
+    }
+    // console.log(relatedNodeIDs);
   }
+
+  // while (currentLevelNodeIDs.length > 0) {
+  //   const nextLevelNodeIDs = [];
+  //   console.log('while loop');
+  //   currentLevelNodeIDs.forEach((nodeId) => {
+  //     if (relatedNodeIDs.includes(nodeId) || nextLevelNodeIDs.includes(nodeId)) {
+  //       console.log('return');
+  //       console.log(nodeId);
+  //       console.log(relatedNodeIDs);
+  //       console.log(nextLevelNodeIDs);
+  //       return;
+  //     }
+  //     relatedNodeIDs.push(nodeId);
+  //     const originNode = wholeGraphNodes.find(n => (n.id === nodeId));
+  //     const nextLevel = originNode.outLinks;
+  //     nextLevel.forEach((outNodeId) => {
+  //       nextLevelNodeIDs.push(outNodeId);
+  //     });
+  //   });
+  //   currentLevelNodeIDs = nextLevelNodeIDs;
+  // }
   return relatedNodeIDs;
 };
 
@@ -43,23 +93,40 @@ export const getAllChildrenNodeIDs = (startingNodeID, wholeGraphNodes) => {
  * @param {Object[]} wholeGraphNodes - array of nodes in the origin whole graph
  * @returns {Edge[]} array of descendent links
  */
-export const getAllChildrenLinks = (startingNodeID, wholeGraphNodes) => {
-  const startingNode = wholeGraphNodes.find(n => n.id === startingNodeID);
-  let currentLevelNodeIDs = startingNode.outLinks;
-  const relatedLinks = currentLevelNodeIDs.map(outID => ({
-    source: startingNode.id,
-    target: outID,
-  }));
+ export const getAllChildrenLinks = (startingNodeID, wholeGraphNodes) => {
+  const startingNode = wholeGraphNodes.find((n) => n.id === startingNodeID);
+  const currentLevelNodeIDs = startingNode.outLinks;
+  const relatedLinks = [];
+  let currentLevelValidNodeIDs = [];
+  currentLevelNodeIDs.forEach((outID) => {
+    const targetID = wholeGraphNodes.find((n) => n.id === outID);
+    const index = targetID.outLinks.findIndex((id) => id === startingNodeID);
+    if (index === -1) {
+      relatedLinks.push({
+        source: startingNode.id,
+        target: outID,
+      });
+      currentLevelValidNodeIDs.push(outID);
+    }
+  });
   const sourceNodeHistory = {};
-  while (currentLevelNodeIDs.length > 0) {
+  while (currentLevelValidNodeIDs.length > 0) {
     const nextLevelNodeIDs = [];
-    for (let i = 0; i < currentLevelNodeIDs.length; i += 1) {
-      const nodeID = currentLevelNodeIDs[i];
+    for (let i = 0; i < currentLevelValidNodeIDs.length; i += 1) {
+      const nodeID = currentLevelValidNodeIDs[i];
       if (sourceNodeHistory[nodeID]) continue; // eslint-disable-line no-continue
-      const originNode = wholeGraphNodes.find(n => (n.id === nodeID));
+      const originNode = wholeGraphNodes.find((n) => (n.id === nodeID));
+      const nextLevelValidNodeIDs = [];
       const nextLevel = originNode.outLinks;
-      for (let j = 0; j < nextLevel.length; j += 1) {
-        const outNodeID = nextLevel[j];
+      nextLevel.forEach((outID) => {
+        const targetID = wholeGraphNodes.find((n) => n.id === outID);
+        const index = targetID.outLinks.findIndex((id) => id === nodeID);
+        if (index === -1) {
+          nextLevelValidNodeIDs.push(outID);
+        }
+      });
+      for (let j = 0; j < nextLevelValidNodeIDs.length; j += 1) {
+        const outNodeID = nextLevelValidNodeIDs[j];
         relatedLinks.push({
           source: nodeID,
           target: outNodeID,
@@ -68,7 +135,7 @@ export const getAllChildrenLinks = (startingNodeID, wholeGraphNodes) => {
         nextLevelNodeIDs.push(outNodeID);
       }
     }
-    currentLevelNodeIDs = nextLevelNodeIDs;
+    currentLevelValidNodeIDs = nextLevelNodeIDs;
   }
   return relatedLinks;
 };
@@ -91,18 +158,24 @@ const inOrOutLinksFromGivenNode = (
 ) => {
   const node = wholeGraphNodes.find(n => n.id === nodeID);
   const links = inOrOut ? node.inLinks : node.outLinks;
+  console.log('subgraphNodeIDs');
+  console.log(subgraphNodeIDs);
+  console.log('subgraphEdges');
+  console.log(subgraphEdges)
   const inLinksFilterFunc = (e, neighborNodeID) => (e.target === nodeID
     && e.source === neighborNodeID
     && subgraphNodeIDs.includes(e.source));
   const outLinksFilterFunc = (e, neighborNodeID) => (e.source === nodeID
     && e.target === neighborNodeID
     && subgraphNodeIDs.includes(e.target));
-  return links.filter(neighborNodeID => subgraphNodeIDs.includes(neighborNodeID))
-    .filter(neighborNodeID => subgraphEdges.find((e) => {
-      if (inOrOut) return inLinksFilterFunc(e, neighborNodeID);
-      return outLinksFilterFunc(e, neighborNodeID);
-    }))
-    .filter(neighborNodeID => (neighborNodeID !== nodeID));
+
+  const filteredLinks = links.filter(neighborNodeID => subgraphNodeIDs.includes(neighborNodeID))
+  .filter(neighborNodeID => subgraphEdges.find((e) => {
+    if (inOrOut) return inLinksFilterFunc(e, neighborNodeID);
+    return outLinksFilterFunc(e, neighborNodeID);
+  }))
+  .filter(neighborNodeID => (neighborNodeID !== nodeID));
+  return filteredLinks;
 };
 
 /**

@@ -198,7 +198,7 @@ export async function getModelExploreData() {
     }
   }
   const newDataList = dataList;
-
+  console.log(newDataList);
   return {
     data: newDataList,
     version: version,
