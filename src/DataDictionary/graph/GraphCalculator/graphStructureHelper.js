@@ -158,10 +158,6 @@ const inOrOutLinksFromGivenNode = (
 ) => {
   const node = wholeGraphNodes.find(n => n.id === nodeID);
   const links = inOrOut ? node.inLinks : node.outLinks;
-  console.log('subgraphNodeIDs');
-  console.log(subgraphNodeIDs);
-  console.log('subgraphEdges');
-  console.log(subgraphEdges)
   const inLinksFilterFunc = (e, neighborNodeID) => (e.target === nodeID
     && e.source === neighborNodeID
     && subgraphNodeIDs.includes(e.source));

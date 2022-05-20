@@ -1,33 +1,47 @@
+/* eslint-disable react/prefer-stateless-function */
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core';
 import { getCategoryColor, getCategoryIconSVG } from '../../NodeCategories/helper';
 import { capitalizeFirstLetter } from '../../../utils';
-import DataDictionaryNode from '../DataDictionaryNode/.';
-import './DataDictionaryCategory.css';
+import DataDictionaryNode from '../DataDictionaryNode';
+import styles from './DataDictionaryCategory.style';
 
 class DataDictionaryCategory extends React.Component {
   render() {
-    const IconSVG = getCategoryIconSVG(this.props.category);
-    return (<div className='data-dictionary-category'>
-      <div className='data-dictionary-category__head' style={{ borderLeftColor: getCategoryColor(this.props.category) }}>
-        <IconSVG className='data-dictionary-category__icon' />
-        <span>
-          {capitalizeFirstLetter(this.props.category)}
-        </span>
-        <span className='data-dictionary-category__download_template'>Download Template</span>
-      </div>
-      {
+    const { classes, category, highlightingNodeID } = this.props;
+    const IconSVG = getCategoryIconSVG(category);
+    return (
+      <div className={classes.category}>
+        <div
+          className={classes.categoryHead}
+          style={{ borderLeftColor: getCategoryColor(category) }}
+        >
+          <IconSVG className={`${classes.categoryIcon} ${category}`} />
+          <span style={{ color: getCategoryColor(category) }}>
+            {capitalizeFirstLetter(category)}
+          </span>
+        </div>
+        <div
+          className={classes.categoryDivider}
+          style={{ borderLeftColor: getCategoryColor(category) }}
+        />
+        {
         this.props.nodes.map(
-          node => (<DataDictionaryNode
-            node={node}
-            key={node.id}
-            description={node.description}
-            expanded={this.props.highlightingNodeID && this.props.highlightingNodeID === node.id}
-            onExpandNode={this.props.onExpandNode}
-          />),
+          (node) => (
+            <DataDictionaryNode
+              node={node}
+              key={node.id}
+              description={node.description}
+              expanded={highlightingNodeID
+                && highlightingNodeID === node.id}
+              onExpandNode={this.props.onExpandNode}
+            />
+          ),
         )
       }
-    </div>);
+      </div>
+    );
   }
 }
 
@@ -48,4 +62,4 @@ DataDictionaryCategory.defaultProps = {
   onExpandNode: () => {},
 };
 
-export default DataDictionaryCategory;
+export default withStyles(styles)(DataDictionaryCategory);
