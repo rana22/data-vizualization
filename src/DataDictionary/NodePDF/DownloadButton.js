@@ -123,10 +123,11 @@ const styles = () => ({
   },
   nodeDownloadBtn: {
     marginLeft: '15px',
-    // background: '#0D71A3',
-    background: 'transparent',
+    background: '#0D71A3',
+    // background: 'transparent',
     height: '35px',
     color: '#fff',
+    padding: '0',
 
   },
   image: {

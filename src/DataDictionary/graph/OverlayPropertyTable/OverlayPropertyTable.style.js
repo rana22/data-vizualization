@@ -79,6 +79,9 @@ export default () => ({
   property: {
     marginTop: '-5px',
   },
+  propertyTable: {
+    padding: '10px 18px 18px 23px',
+  },
   downloadButton: {
     minWidth: 'unset', /* override .g3-button's 152px min-width */
     height: '30px',
@@ -181,6 +184,12 @@ export default () => ({
     display: 'block',
     backgroundColor: '#e7e5e5',
     borderLeft: '5px solid var(--dictionary-border-color)',
+  },
+  propertySummary: {
+    /* margin: 5px 0', */
+    color: '#7a7a7a',
+    paddingLeft: '17px',
+    marginBottom: '8px',
   },
 });
   

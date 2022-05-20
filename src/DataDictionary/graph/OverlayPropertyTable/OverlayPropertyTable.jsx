@@ -15,12 +15,19 @@ import { getCategoryColor, getCategoryIconSVG } from '../../NodeCategories/helpe
 import DataDictionaryPropertyTable from '../../table/DataDictionaryPropertyTable';
 import styles from './OverlayPropertyTable.style';
 import IconDownloadPDF from '../../table/icons/icon_download_PDF.svg';
+import IconDownloadPTSV from '../../table/icons/icon_download_TSV.svg';
 
 const pdfDownloadConfig = {
   image: IconDownloadPDF,
   type: 'single',
   fileType: 'pdf',
   prefix: 'ICDC_Data_Model_',
+};
+
+const csvBtnDownloadConfig = {
+  image: IconDownloadPTSV,
+  fileType: 'txt',
+  prefix: 'ICDC-',
 };
 
 const expanded = true;
@@ -92,12 +99,27 @@ class OverlayPropertyTable extends React.Component {
                   <i className={`${classes.closeIcon} g3-icon g3-icon--cross g3-icon--sm`} />
                 </span>
                 <div className={classes.downloadButton}>
+                  {
+                    (node.template === 'Yes')
+                    && (
+                    <DownloadButton
+                      config={csvBtnDownloadConfig}
+                      documentData={node}
+                      template={node.template}
+                      fileName={createFileName(node.id, csvBtnDownloadConfig.prefix)}
+                    />
+                    )
+                  }
                   <DownloadButton
                     config={pdfDownloadConfig}
                     documentData={node}
                     fileName={createFileName('', pdfDownloadConfig.prefix)}
                   />
+                  
                 </div>
+                <div className={classes.buttonWrap}>
+                
+              </div>
               </div>
             </div>
             <div
@@ -140,19 +162,30 @@ class OverlayPropertyTable extends React.Component {
 
             </Grid>
             </div>
-            
-            <div className={classes.property}>
-              <DataDictionaryPropertyTable
-                properties={node.properties}
-                requiredProperties={node.required}
-                preferredProperties={node.preferred}
-                hasBorder={false}
-                onlyShowMatchedProperties={searchedNodeNotOpened}
-                needHighlightSearchResult={needHighlightSearchResult}
-                // hideIsRequired={searchedNodeNotOpened}
-                matchedResult={this.props.matchedResult}
-              />
-            </div>
+
+            <div className={classes.propertyTable}>
+              <div className={classes.propertySummary}>
+                <i>
+                  <span>{node.title}</span>
+                  <span> has </span>
+                  <span>{Object.keys(node.properties).length}</span>
+                  <span> properties. </span>
+                </i>
+              </div>
+                  
+              <div className={classes.property}>
+                <DataDictionaryPropertyTable
+                  properties={node.properties}
+                  requiredProperties={node.required}
+                  preferredProperties={node.preferred}
+                  hasBorder={false}
+                  onlyShowMatchedProperties={searchedNodeNotOpened}
+                  needHighlightSearchResult={needHighlightSearchResult}
+                  // hideIsRequired={searchedNodeNotOpened}
+                  matchedResult={this.props.matchedResult}
+                />
+              </div>
+            </div>        
           </div>
         </div>
       </div>
